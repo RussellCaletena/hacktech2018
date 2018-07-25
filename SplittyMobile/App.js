@@ -35,7 +35,7 @@ const SimpleStack = createStackNavigator(
     }
   },
   {
-    initialRouteName: 'Camera',
+    initialRouteName: 'Assign',
   }
 );
 
