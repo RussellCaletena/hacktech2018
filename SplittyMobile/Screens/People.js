@@ -11,7 +11,8 @@ import {
   Image,
   TextInput,
   KeyboardAvoidingView,
-  Keyboard
+  Keyboard,
+  Button
 } from 'react-native';
 const trash = require('../Images/trash.png');
 const plus = require('../Images/plus.png');
@@ -28,13 +29,20 @@ const colors = ["#6CE6C1","#8594E8","#6CC0E6","#E594FF","#F1FF94"]
 export default class People extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('otherParam', 'A Nested Details Screen'),
+      title: 'People',
+      headerRight: (
+        <Button
+          onPress={() => navigation.getParam('people') === undefined || navigation.getParam('people').length === 0 ? null : navigation.navigate('Assign', {receiptData: navigation.getParam('receiptData'), people: navigation.getParam('people')})}
+          title="Next"
+        />
+      ),
     }
   }
 
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this._keyboardWillShow);
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this._keyboardWillHide);
+    this.props.navigation.setParams({receiptData: this.props.navigation.getParam('receiptData')});
   }
 
   componentWillUnmount () {
@@ -51,8 +59,7 @@ export default class People extends Component {
   }
 
   state = {
-    people: [{key: 'Abd', name: 'Abdallah AbuHashem', color: '#6CE6C1'},
-             {key: 'Ros', name: 'Rosanne Hu', color: '#8594E8'}],
+    people: [],
     newName: "",
     marginBottom: Dimensions.get('window').height === 812 ? 40 : 16
   }
@@ -94,6 +101,7 @@ export default class People extends Component {
     var newList = this.state.people.slice();
     newList.push({key: this.state.newName.substring(0,3), name: this.state.newName, color: colors[newList.length]});
     this.setState({people: newList, newName: ""});
+    this.props.navigation.setParams({ people: newList });
   }
 
   render() {//spec

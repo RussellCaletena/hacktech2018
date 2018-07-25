@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import ImgToBase64 from 'react-native-image-base64';
+var base64js = require('base64-js')
 
 //creating a class, this class inherits from compnent which is from react lib^^
 //export
@@ -27,41 +28,28 @@ export default class Camera extends Component {
   //render
   //componentDidMount
 
-  uploadPhoto(PicturePath) {
+  uploadPhoto = async (PicturePath) => {
 
-    ImgToBase64.getBase64String(PicturePath)
-      .then(base64String => {
-        var result = fetch('http://10.105.73.133:8000/shopperHelper/addReceipt', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'text/html',
-          },
-          body: 'data=' + base64String
-        });
+    const data = new FormData();
+    data.append('name', 'testName'); // you can append anyone.
+    data.append('photo', {
+      uri: PicturePath,
+      type: 'image/jpeg', // or photo.type
+      name: 'testPhotoName'
+    });
+    try {
+
+      var response = await fetch('http://10.106.233.218:8000/api/', {
+        method: 'post',
+        body: data
       });
-  // .then(response => checkStatus(response))
-  // .then(response => response.json())
-  // .catch(e => { throw e; });
-  //
-  // return result;
 
+      var responseJson = await response.json();
+      this.props.navigation.navigate('People', {receiptData: responseJson.text});
+    } catch (error) {
+      this.props.navigation.navigate('People', {receiptData: responseJson});
+    }
 
-    // const data = new FormData();
-    // data.append('name', 'testName'); // you can append anyone.
-    // data.append('photo', {
-    //   uri: PicturePath,
-    //   type: 'image/jpeg', // or photo.type
-    //   name: 'testPhotoName'
-    // });
-    //
-    // ImgToBase64.getBase64String(PicturePath)
-    //   .then(base64String => {
-    //     console.log(base64String);
-    //     fetch('http://10.105.73.133:8000/api', {body: base64String}).then(res => {
-    //       console.log(res)
-    //     });
-    //   });
 
   }
 
@@ -89,13 +77,13 @@ export default class Camera extends Component {
 
   takePicture = async function() {
     if (this.camera) {
-      const options = { quality: 0.5, base64: true };
+      const options = { quality: 0.3, forceUpOrientation:true };
       const data = await this.camera.takePictureAsync(options)
       console.log(data.uri);
       CameraRoll.saveToCameraRoll(data.uri);
       //send whole image to sever.
-      // this.uploadPhoto(data.uri);
-      this.props.navigation.navigate('People');//props and static
+      this.uploadPhoto(data.uri);
+      //props and static
         }
   };
 }
