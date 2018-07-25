@@ -76,6 +76,7 @@ export default class Assign extends Component {
           renderItem={({item}) => this.renderName(item)}
         />*/}
         <Text> {this.state.anything} </Text>
+      
       </View>
 
     );
